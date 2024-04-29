@@ -31,7 +31,7 @@ def han(
     if True not in (kana, num, alph):
         exit("Set at least one option: --kana, --num, --alph")
     if os.path.exists(dst) and not _confirm_overwrite():
-        return
+        exit("Aborted.")
     prs: Presentation = pptx.Presentation(src)
     for slide in tqdm(prs.slides):
         translate(
@@ -43,7 +43,11 @@ def han(
             alph=alph,
             skip_title=skip_title,
         )
-    prs.save(dst)
+    try:
+        prs.save(dst)
+    except PermissionError:
+        exit("Failed to save. Please close Power Point files and try again.")
+    exit("Done!")
 
 
 @cli.command()
@@ -64,7 +68,7 @@ def zen(
     if True not in (kana, num, alph):
         exit("Set at least one option: --kana, --num, --alph")
     if os.path.exists(dst) and not _confirm_overwrite():
-        return
+        exit("Aborted.")
     prs: Presentation = pptx.Presentation(src)
     for slide in tqdm(prs.slides):
         translate(
@@ -76,14 +80,21 @@ def zen(
             alph=alph,
             skip_title=skip_title,
         )
-    prs.save(dst)
+    try:
+        prs.save(dst)
+    except PermissionError:
+        exit("Failed to save. Please close the PowerPoint file and try again.")
+    exit("Done!")
 
 
 def _confirm_overwrite() -> bool:
     ans = None
     while ans is None:
         try:
-            ans = click.confirm("File already exists. Overwrite?", default=None)
+            ans = click.confirm(
+                "File already exists. Do you want to overwrite it?",
+                default=None,
+            )
         except NameError:
             ans = None
     return ans

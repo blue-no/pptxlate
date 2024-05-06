@@ -1,3 +1,4 @@
+#_maps.py
 _kana = {
     "full": [
         "ア",
